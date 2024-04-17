@@ -3,7 +3,7 @@ import os
 import pytest
 
 
-run_script = os.getenv('TASK3_RUN', 'python main.py').split()
+run_script = os.getenv('TASK3_RUN', 'python src/main.py').split()
 
 
 def test_without_params():
@@ -42,7 +42,7 @@ def test_three_different_params():
     assert input_text in output
 
 
-from main import check_winner
+from src.main import check_winner
 def test_draft():
     assert 0 == check_winner(['1', '2', '3'], 1, 1)
 

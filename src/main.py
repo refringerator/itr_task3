@@ -21,7 +21,7 @@ def check_winner(params, a: int, b: int) -> int:
         raise IndexError("Index out of range")
 
     p = math.floor(n / 2)
-    return (a - b + p + n) % n - p;
+    return (a - b + p + n) % n - p
 
 
 def main():
