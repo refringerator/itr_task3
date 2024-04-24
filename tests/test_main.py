@@ -36,7 +36,7 @@ def test_three_different_params():
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             universal_newlines=True)
-    input_text = "work"
+    input_text = "Available moves"
     output, _ = process.communicate(input=input_text)
 
     assert input_text in output
