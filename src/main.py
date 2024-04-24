@@ -8,6 +8,7 @@ import random
 import secrets
 import hmac
 import math
+import urllib.parse
 from prettytable.colortable import ColorTable, Themes
 
 
@@ -48,7 +49,7 @@ def check_winner(params: list, a: int|str, b: int|str) -> int:
 
 
 def calc_hmac(secret: str, message: str):
-    return hmac.new(secret.encode(), message.encode(), hashlib.sha3_256).hexdigest()
+    return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
 
 def main():
     computer_moves = []
@@ -87,6 +88,15 @@ def main():
 
         ans = input("Enter your move: ")
         if ans == '0':
+            print(f"key = {secret}")
+            params = {
+                'key': secret,
+                'messages': ','.join(computer_moves)
+            }
+            k = urllib.parse.urlencode(params)
+            resource = 'https://refringerator.github.io/itr_task3'
+            link = f"{resource}/?{k}"
+            print(link)
             break
 
         if ans == '?':
