@@ -1,11 +1,15 @@
 from prettytable.colortable import ColorTable, Themes
+from prettytable import PrettyTable
 from game import Game
 
 
 def show_table(game: Game):
-    table = ColorTable(theme=Themes.OCEAN)
+    # table = ColorTable(theme=Themes.DEFAULT)
+    table = PrettyTable()
     table.field_names = ["v PC \\ User >", *game.moves]
+    
 
+    # res = game.generate_result_function("Draw", "Win", "Lose")
     def res(p):
         if p == 0:
             return "Draw"
