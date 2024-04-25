@@ -39,3 +39,15 @@ class Game:
 
         p = math.floor(n / 2)
         return (a - b + p + n) % n - p
+
+    def generate_result_function(self, draw: str, a_winner: str, b_winner: str):
+        def _result(a: int | str, b: int | str) -> str:
+            r = self.check_winner(a, b)
+            if r == 0:
+                return draw
+            elif r > 0:
+                return b_winner
+            elif r < 0:
+                return a_winner
+
+        return _result

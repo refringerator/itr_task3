@@ -22,6 +22,7 @@ def main():
         eprint("Arguments must be different")
 
     game = Game(moves=params)
+    result = game.generate_result_function("Draw", "You win!", "Computer win!")
 
     menu_action = None
     menu_items = (
@@ -34,8 +35,8 @@ def main():
 
     while True:
         message, c_move = game.generate_computer_move()
-        hmac2 = hmac.calc(message)
-        print(f"HMAC: {hmac2}")
+        hmac_code = hmac.calc(message)
+        print(f"HMAC: {hmac_code}")
 
         print(menu.generate_menu())
 
@@ -52,17 +53,7 @@ def main():
         umi = int(ans) - 1
         print(f"Your move: {params[umi]}")
         print(f"Computer move: {c_move}")
-
-        r = game.check_winner(umi, c_move)
-
-        if r == 0:
-            gg = "Draw"
-        elif r > 0:
-            gg = "Computer win!"
-        elif r < 0:
-            gg = "You win!"
-
-        print(f"{gg}")
+        print(f"{result(umi, c_move)}")
 
         print("*" * 50)
 
