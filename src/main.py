@@ -1,15 +1,12 @@
-# доки https://hmacgenerator.com/
-# https://pypi.org/project/prettytable/
-# https://rich.readthedocs.io/en/stable/introduction.html
+#!/usr/bin/env python3
 
 import sys
-import hashlib
+from secret import generate_secret_key, calc_hmac
 import random
-import secrets
-import hmac
-import math
 import urllib.parse
-from prettytable.colortable import ColorTable, Themes
+from game import check_winner
+from menu import show_menu
+from table import show_table
 
 
 def eprint(*args, **kwargs):
@@ -18,42 +15,9 @@ def eprint(*args, **kwargs):
     sys.exit(1)
 
 
-def show_table(params: list):
-    table = ColorTable(theme=Themes.OCEAN)
-    table.field_names = ["v PC \\ User >", *params]
-
-    def res(p):
-        if p==0: return "Draw"
-        if p>0: return "Lose"
-        if p<0: return "Win"
-
-    for param in params:
-        table.add_row([param, *[res(check_winner(params, param, p)) for p in params]])
-
-    print("Table shows your result")
-    print(table)
-
-
-def check_winner(params: list, a: int|str, b: int|str) -> int:
-    n = len(params)
-    if isinstance(a, str):
-        a = params.index(a)
-    if isinstance(b, str):
-        b = params.index(b)
-
-    if a>=n or b>=n or a<0 or b<0:
-        raise IndexError("Index out of range")
-
-    p = math.floor(n / 2)
-    return (a - b + p + n) % n - p
-
-
-def calc_hmac(secret: str, message: str):
-    return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
-
 def main():
     computer_moves = []
-    secret = secrets.token_urlsafe(16)
+    secret = generate_secret_key()
     params = sys.argv[1:]
     if len(params) < 3:
         eprint('Not enough arguments')
@@ -78,13 +42,7 @@ def main():
         # print(hmac, message, cmi)
         print(f"HMAC: {hmac}")
 
-        # show 
-        print("Available moves:")
-        for i,v in enumerate(params, 1):
-            print(f"{i} - {v}")
-
-        print("0 - exit")
-        print("? - help")
+        show_menu(params)
 
         ans = input("Enter your move: ")
         if ans == '0':
