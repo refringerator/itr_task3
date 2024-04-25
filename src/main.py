@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from secret import generate_secret_key, calc_hmac
+from secret import Hmac
 
 from helpers import eprint, generate_check_url
 from game import Game
@@ -10,7 +10,7 @@ from table import show_table
 
 
 def main():
-    secret = generate_secret_key()
+    hmac = Hmac()
     params = sys.argv[1:]
     if len(params) < 3:
         eprint("Not enough arguments")
@@ -25,15 +25,15 @@ def main():
 
     while True:
         message, c_move = game.generate_computer_move()
-        hmac = calc_hmac(secret, message)
-        print(f"HMAC: {hmac}")
+        hmac2 = hmac.calc(message)
+        print(f"HMAC: {hmac2}")
 
         show_menu(game.moves)
 
         ans = input("Enter your move: ")
         if ans == "0":
-            print(f"key = {secret}")
-            print(generate_check_url(secret, game.computer_moves))
+            print(f"key = {hmac.secret}")
+            print(generate_check_url(hmac.secret, game.computer_moves))
             break
 
         if ans == "?":
