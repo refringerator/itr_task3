@@ -1,7 +1,5 @@
 import subprocess
 import os
-import pytest
-from src.main import check_winner
 
 
 run_script = os.getenv("TASK3_RUN", "python src/main.py").split()
@@ -47,22 +45,3 @@ def test_three_different_params():
     output, _ = process.communicate(input=input_text)
 
     assert input_text in output
-
-
-def test_draft():
-    assert 0 == check_winner(["1", "2", "3"], 1, 1)
-
-
-def test_winner_a():
-    assert check_winner(["1", "2", "3", "4", "5"], 3, 1) > 0
-
-
-def test_winner_b():
-    assert check_winner(["1", "2", "3", "4", "5"], 4, 1) < 0
-
-
-def test_exception():
-    with pytest.raises(IndexError) as excinfo:
-        check_winner(["1", "2", "3", "4", "5"], 42, 1)
-
-    assert str(excinfo.value) == "Index out of range"

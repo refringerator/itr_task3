@@ -3,16 +3,10 @@
 import sys
 from secret import generate_secret_key, calc_hmac
 import random
-import urllib.parse
-from game import check_winner
+from helpers import eprint, generate_check_url
+from game import Game
 from menu import show_menu
 from table import show_table
-
-
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-    print("Usage example: python", sys.argv[0], "rock", "paper", "scissors")
-    sys.exit(1)
 
 
 def main():
@@ -28,6 +22,8 @@ def main():
     if len(params) != len(set(params)):
         eprint("Arguments must be different")
 
+    game = Game(moves=params)
+
     n = 0
     while True:
         # random move
@@ -38,7 +34,6 @@ def main():
         computer_moves.append(message)
 
         hmac = calc_hmac(secret, message)
-        # print(hmac, message, cmi)
         print(f"HMAC: {hmac}")
 
         show_menu(params)
@@ -46,11 +41,7 @@ def main():
         ans = input("Enter your move: ")
         if ans == "0":
             print(f"key = {secret}")
-            params = {"key": secret, "messages": ",".join(computer_moves)}
-            k = urllib.parse.urlencode(params)
-            resource = "https://refringerator.github.io/itr_task3"
-            link = f"{resource}/?{k}"
-            print(link)
+            print(generate_check_url(secret, computer_moves))
             break
 
         if ans == "?":
@@ -61,7 +52,7 @@ def main():
         print(f"Your move: {params[umi]}")
         print(f"Computer move: {params[cmi]}")
 
-        r = check_winner(params, umi, cmi)
+        r = game.check_winner(umi, cmi)
 
         if r == 0:
             gg = "Draw"
