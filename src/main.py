@@ -5,7 +5,7 @@ from secret import Hmac
 
 from helpers import eprint, generate_check_url
 from game import Game
-from menu import show_menu
+from menu import Menu, MenuItem
 from table import show_table
 
 
@@ -23,12 +23,21 @@ def main():
 
     game = Game(moves=params)
 
+    menu_action = None
+    menu_items = (
+        [MenuItem(str(i), val, menu_action) for i, val in enumerate(game.moves, 1)]
+        + [MenuItem("0", "exit", None)]
+        + [MenuItem("?", "help", None)]
+    )
+
+    menu = Menu(menu_items, header="Available moves:")
+
     while True:
         message, c_move = game.generate_computer_move()
         hmac2 = hmac.calc(message)
         print(f"HMAC: {hmac2}")
 
-        show_menu(game.moves)
+        print(menu.generate_menu())
 
         ans = input("Enter your move: ")
         if ans == "0":
