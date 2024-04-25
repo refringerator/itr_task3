@@ -7,9 +7,12 @@ def show_table(params: list):
     table.field_names = ["v PC \\ User >", *params]
 
     def res(p):
-        if p==0: return "Draw"
-        if p>0: return "Lose"
-        if p<0: return "Win"
+        if p == 0:
+            return "Draw"
+        if p > 0:
+            return "Lose"
+        if p < 0:
+            return "Win"
 
     for param in params:
         table.add_row([param, *[res(check_winner(params, param, p)) for p in params]])

@@ -20,14 +20,13 @@ def main():
     secret = generate_secret_key()
     params = sys.argv[1:]
     if len(params) < 3:
-        eprint('Not enough arguments')
+        eprint("Not enough arguments")
 
     if len(params) % 2 == 0:
         eprint("There must be an odd number of arguments")
 
     if len(params) != len(set(params)):
         eprint("Arguments must be different")
-
 
     n = 0
     while True:
@@ -45,39 +44,36 @@ def main():
         show_menu(params)
 
         ans = input("Enter your move: ")
-        if ans == '0':
+        if ans == "0":
             print(f"key = {secret}")
-            params = {
-                'key': secret,
-                'messages': ','.join(computer_moves)
-            }
+            params = {"key": secret, "messages": ",".join(computer_moves)}
             k = urllib.parse.urlencode(params)
-            resource = 'https://refringerator.github.io/itr_task3'
+            resource = "https://refringerator.github.io/itr_task3"
             link = f"{resource}/?{k}"
             print(link)
             break
 
-        if ans == '?':
+        if ans == "?":
             show_table(params)
             continue
 
-        umi = int(ans)-1
+        umi = int(ans) - 1
         print(f"Your move: {params[umi]}")
         print(f"Computer move: {params[cmi]}")
-        
+
         r = check_winner(params, umi, cmi)
 
         if r == 0:
-            gg = 'Draw'
-        elif r>0:
-            gg = 'Computer win!'
-        elif r<0:
-            gg = 'You win!'
+            gg = "Draw"
+        elif r > 0:
+            gg = "Computer win!"
+        elif r < 0:
+            gg = "You win!"
 
         print(f"{gg}")
 
         print(f"Comp {cmi}, user {umi}, result={r}")
-        print('*'*50)
+        print("*" * 50)
 
 
 if __name__ == "__main__":
@@ -85,4 +81,3 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("\ncya")
-
