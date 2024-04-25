@@ -15,3 +15,9 @@ game3:
 
 game7:
 	${PYTHON} src/main.py python rust ruby java php js c# 
+
+format:
+	ruff format .
+
+lint:
+	ruff check .
