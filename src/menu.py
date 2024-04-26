@@ -1,6 +1,6 @@
 from string import Template
 from collections import namedtuple
-
+from functools import reduce
 
 MenuItem = namedtuple("MenuItem", ["key", "description", "action"])
 
@@ -22,3 +22,16 @@ class Menu:
 
     def check_input(self, input: str) -> bool:
         return input in [item.key for item in self.items]
+
+    def select(self, text):
+        print(self.generate_menu())
+        user_input = input(text)
+        while not self.check_input(user_input):
+            print("Invalid input!")
+            return self.select(text)
+
+        return reduce(
+            lambda x, el: el.action if el.key == user_input and el.action else x,
+            self.items,
+            user_input,
+        )

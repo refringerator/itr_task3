@@ -3,63 +3,68 @@
 import sys
 from secret import Hmac
 
-from helpers import eprint, generate_check_url
+from helpers import check_params, generate_check_url
 from game import Game
 from menu import Menu, MenuItem
 from table import show_table
+from sm import InteractMachine, Lol
 
 
-def main():
+def main(params: list[str]):
     hmac = Hmac()
-    params = sys.argv[1:]
-    if len(params) < 3:
-        eprint("Not enough arguments")
-
-    if len(params) % 2 == 0:
-        eprint("There must be an odd number of arguments")
-
-    if len(params) != len(set(params)):
-        eprint("Arguments must be different")
-
     game = Game(moves=params)
     result = game.generate_result_function("Draw", "You win!", "Computer win!")
 
     menu_action = None
     menu_items = (
         [MenuItem(str(i), val, menu_action) for i, val in enumerate(game.moves, 1)]
-        + [MenuItem("0", "exit", None)]
-        + [MenuItem("?", "help", None)]
+        + [MenuItem("0", "exit", Lol.EXIT)]
+        + [MenuItem("?", "help", Lol.HELP)]
     )
 
     menu = Menu(menu_items, header="Available moves:")
 
-    while True:
+    lol = Lol(help_action=lambda: show_table(game))
+    sm = InteractMachine(lol)
+    sm.run()
+
+    def pre_ask():
         message, c_move = game.generate_computer_move()
         hmac_code = hmac.calc(message)
-        print(f"HMAC: {hmac_code}")
 
-        print(menu.generate_menu())
+        text = f"HMAC: {hmac_code}"
+        print(text)
+        return c_move
 
-        ans = input("Enter your move: ")
-        if ans == "0":
+    while not sm.current_state.final:
+        c_move = pre_ask()
+
+        sm.send("input", menu.select("Enter your move: "))
+
+        if lol.ans == Lol.EXIT:
             print(f"key = {hmac.secret}")
             print(generate_check_url(hmac.secret, game.computer_moves))
-            break
 
-        if ans == "?":
-            show_table(game)
-            continue
+        elif lol.ans == Lol.HELP:
+            pass
 
-        umi = int(ans) - 1
-        print(f"Your move: {params[umi]}")
-        print(f"Computer move: {c_move}")
-        print(f"{result(umi, c_move)}")
+        else:
+            umi = int(lol.ans) - 1
 
-        print("*" * 50)
+            text = (
+                f"Your move: {params[umi]}\n"
+                f"Computer move: {c_move}\n"
+                f"{result(umi, c_move)}\n"
+                f"{'*' * 80}"
+            )
+
+            print(text)
 
 
 if __name__ == "__main__":
+    check_params(params:=sys.argv[1:])
+
     try:
-        main()
+        main(params)
     except KeyboardInterrupt:
         print("\ncya")

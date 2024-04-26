@@ -18,3 +18,14 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
     print("Usage example: python", sys.argv[0], "rock", "paper", "scissors")
     sys.exit(1)
+
+
+def check_params(params):
+    if len(params) < 3:
+        eprint("Not enough arguments")
+
+    if len(params) % 2 == 0:
+        eprint("There must be an odd number of arguments")
+
+    if len(params) != len(set(params)):
+        eprint("Arguments must be different")
