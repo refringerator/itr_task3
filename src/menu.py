@@ -19,3 +19,6 @@ class Menu:
         if self.header:
             menu_lines.insert(0, self.header)
         return "\n".join(menu_lines)
+
+    def check_input(self, input: str) -> bool:
+        return input in [item.key for item in self.items]
