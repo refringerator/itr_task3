@@ -21,3 +21,6 @@ format:
 
 lint:
 	ruff check .
+
+lintfix:
+	ruff check . --unsafe-fixes --fix

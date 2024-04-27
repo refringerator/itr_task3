@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import math
 import random
+from secret import Hmac
 
 
 @dataclass
@@ -13,11 +14,14 @@ class Round:
 
 
 class Game:
-    def __init__(self, moves: list[str]) -> None:
+    def __init__(self, moves: list[str], secret="") -> None:
+        self.hmac = Hmac(secret_key=secret)
+        self.secret = self.hmac.secret
         self.moves = moves
         self.rounds = []
         self.n = 0
         self.computer_moves = []
+        self.last_computer_move = ""
 
     def generate_computer_move(self) -> str:
         self.n += 1
@@ -26,6 +30,12 @@ class Game:
         self.computer_moves.append(message)
 
         return message, move
+
+    def prepare_round(self):
+        message, c_move = self.generate_computer_move()
+        hmac_code = self.hmac.calc(message)
+        print(f"HMAC: {hmac_code}")
+        self.last_computer_move = c_move
 
     def check_winner(self, a: int | str, b: int | str) -> int:
         n = len(self.moves)

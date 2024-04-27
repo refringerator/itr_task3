@@ -1,10 +1,14 @@
+from typing import Any
 from statemachine import State
 from statemachine import StateMachine
+
+from game import Game
 
 
 class InteractMachine(StateMachine):
     start = State(initial=True)
     show_info = State()
+    round = State()
     help = State()
     finish = State(final=True)
 
@@ -13,32 +17,74 @@ class InteractMachine(StateMachine):
     input = (
         show_info.to(help, cond="help")
         | show_info.to(finish, cond="exit")
-        | show_info.to(show_info, cond="move")
+        | show_info.to(round, cond="move")
     )
 
-    auto = help.to(show_info)
+    auto = round.to(show_info) | help.to(show_info)
+
+    def __init__(
+        self,
+        input_function,
+        model: Any = None,
+        state_field: str = "state",
+        start_value: Any = None,
+        rtc: bool = True,
+        allow_event_without_transition: bool = False,
+    ):
+        super().__init__(
+            model, state_field, start_value, rtc, allow_event_without_transition
+        )
+        self.input_function = input_function
 
     def on_enter_help(self):
+        self.send("auto")
+
+    def on_enter_round(self):
         self.send("auto")
 
     def run(self):
         self.send("begin")
 
-    def ppp(self):
-        self.send("begin")
+        while not self.current_state.final:
+            self.send("input", self.input_function())
 
 
-class Lol:
+class Engine:
     HELP = "HELP ANSWER"
     EXIT = "END ANSWER"
 
-    def __init__(self, help_action=None):
+    def __init__(
+        self,
+        game: Game,
+        help_action=None,
+        finish_action=None,
+        round_action=None,
+        show_info_action=None,
+    ):
+        self.game = game
         self.ans = ""
-        self.help_action = help_action
+        self.help_action = self.prepare_function(help_action)
+        self.finish_action = self.prepare_function(finish_action)
+        self.round_action = self.prepare_function(round_action)
+        self.show_info_action = self.prepare_function(show_info_action)
+
+    @staticmethod
+    def prepare_function(func):
+        if not func:
+            return lambda *args: None
+        return func
 
     def on_enter_help(self):
-        if self.help_action:
-            self.help_action()
+        self.help_action(self.game)
+
+    def on_enter_finish(self):
+        self.finish_action()
+
+    def on_enter_round(self):
+        self.round_action(self.ans, self.game)
+
+    def on_enter_show_info(self):
+        self.show_info_action(self.game)
 
     def move(self, ans):
         self.ans = ans
