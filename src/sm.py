@@ -62,7 +62,6 @@ class Engine:
         show_info_action=None,
     ):
         self.game = game
-        self.ans = ""
         self.help_action = self.prepare_function(help_action)
         self.finish_action = self.prepare_function(finish_action)
         self.round_action = self.prepare_function(round_action)
@@ -81,19 +80,21 @@ class Engine:
         self.finish_action()
 
     def on_enter_round(self):
-        self.round_action(self.ans, self.game)
+        self.round_action(self.game.last_user_move, self.game)
+        self.game.finish_round()
+
+    def on_exit_round(self):
+        self.game.show_round_result()
 
     def on_enter_show_info(self):
         self.show_info_action(self.game)
 
     def move(self, ans):
-        self.ans = ans
+        self.game.set_last_user_move(ans)
         return True
 
     def help(self, ans):
-        self.ans = ans
         return ans == self.HELP
 
     def exit(self, ans):
-        self.ans = ans
         return ans == self.EXIT

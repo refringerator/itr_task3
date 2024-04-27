@@ -22,33 +22,20 @@ def main(params: list[str]):
         ),
     )
 
-    # def pre_ask():
-    #     message, c_move = game.generate_computer_move()
-    #     hmac_code = game.hmac.calc(message)
-    #     print(f"HMAC: {hmac_code}")
-
-    #     return c_move
-
     engine = Engine(
         game,
         help_action=show_table,
         finish_action=lambda: print(
             f"key = {game.secret}\n"
-            f"{generate_check_url(game.secret, game.computer_moves)}"
+            f"{generate_check_url(game.secret, game.get_computer_moves())}"
         ),
-        round_action=lambda user_move, game: print(
-            (
-                f"Your move: {user_move}\n"
-                f"Computer move: {game.last_computer_move}\n"
-                f"{result(user_move, game.last_computer_move)}\n"
-                f"{'*' * 80}"
-            )
-        ),
+        round_action=lambda user_move, game: game.set_round_result(f"{result(user_move, game.last_computer_move)} - {user_move} - {game.last_computer_move}"),      
         show_info_action=lambda game: game.prepare_round(),
     )
 
     def input_function():
         return menu.select("Enter your move: ")
+    
     sm = InteractMachine(input_function, engine)
     sm.run()
 

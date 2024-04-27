@@ -4,7 +4,7 @@ from game import Game
 
 def show_table(game: Game):
     table = PrettyTable()
-    table.field_names = ["v PC \\ User >", *game.moves]
+    table.field_names = ["v User \\ PC >", *game.moves]
 
     res = game.generate_result_function("Draw", "Win", "Lose")
     for row_move in game.moves:
