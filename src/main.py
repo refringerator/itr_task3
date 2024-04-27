@@ -26,7 +26,8 @@ def main(params: list[str]):
         game,
         help_action=show_table,
         finish_action=lambda: print(
-            f"key = {game.secret}\n"
+            f"Here HMAC key: {game.secret}\n"
+            f"You can check HMAC for computer's moves on the following website\n"
             f"{generate_check_url(game.secret, game.get_computer_moves())}"
         ),
         round_action=lambda user_move, game: game.set_round_result(f"{result(user_move, game.last_computer_move)}"),      
