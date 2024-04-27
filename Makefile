@@ -13,6 +13,9 @@ game4:
 game3:
 	${PYTHON} src/main.py rock paper scissors
 
+game5:
+	${PYTHON} src/main.py rock Spock paper lizard scissors
+
 game7:
 	${PYTHON} src/main.py python rust ruby java php js c# 
 
