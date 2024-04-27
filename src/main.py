@@ -11,7 +11,7 @@ from sm import InteractMachine, Engine
 
 def main(params: list[str]):
     game = Game(moves=params)
-    result = game.generate_result_function("Draw", "You win!", "Computer win!")
+    result = game.generate_result_function("Draw", "Computer win!", "You win!")
 
     menu = Menu(
         header="Available moves:",
@@ -29,7 +29,7 @@ def main(params: list[str]):
             f"key = {game.secret}\n"
             f"{generate_check_url(game.secret, game.get_computer_moves())}"
         ),
-        round_action=lambda user_move, game: game.set_round_result(f"{result(user_move, game.last_computer_move)} - {user_move} - {game.last_computer_move}"),      
+        round_action=lambda user_move, game: game.set_round_result(f"{result(user_move, game.last_computer_move)}"),      
         show_info_action=lambda game: game.prepare_round(),
     )
 

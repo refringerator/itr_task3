@@ -6,7 +6,7 @@ def test_three_moves(capsys):
     game = Game(["rock", "paper", "scissors"])
     out = """Table shows your result
 +---------------+------+-------+----------+
-| v User \\ PC > | rock | paper | scissors |
+| v PC \\ User > | rock | paper | scissors |
 +---------------+------+-------+----------+
 |      rock     | Draw |  Win  |   Lose   |
 |     paper     | Lose |  Draw |   Win    |
@@ -23,7 +23,7 @@ def test_seven_moves(capsys):
     game = Game(["python", "rust", "ruby", "java", "php", "js", "c#"])
     out = """Table shows your result
 +---------------+--------+------+------+------+------+------+------+
-| v User \\ PC > | python | rust | ruby | java | php  |  js  |  c#  |
+| v PC \\ User > | python | rust | ruby | java | php  |  js  |  c#  |
 +---------------+--------+------+------+------+------+------+------+
 |     python    |  Draw  | Win  | Win  | Win  | Lose | Lose | Lose |
 |      rust     |  Lose  | Draw | Win  | Win  | Win  | Lose | Lose |
