@@ -1,11 +1,14 @@
 from dataclasses import dataclass
-import math
+from collections import namedtuple
 import random
+from functools import reduce
 from table import show_rich_table
+from winner_determination import WinnerDetermination as WD
 from secret import Hmac
 from enum import Enum
 
 RoundStatus = Enum("RoudStatus", ["STARTED", "FINISHED"])
+Scores = namedtuple("Scores", ["Player", "Computer"])
 
 
 @dataclass
@@ -17,35 +20,48 @@ class Round:
     status = RoundStatus.STARTED
     player_move: str = ""
     result: str = ""
+    scores: Scores = (0, 0)
 
 
 class Game:
     def _result_function(*args):
         return ""
+
     result_function = _result_function
-    
+
     def __init__(self, moves: list[str], secret=""):
         self.hmac = Hmac(secret_key=secret)
         self.rounds: list[Round] = []
         self.computer_moves = []
         self.moves = moves
+        self.wd = WD(moves)
 
     def set_result_function(self, *args):
-        self.result_function = self.generate_result_function(*args)
+        self.result_function = self.wd.generate_result_function(*args)
 
     def get_secret(self):
         return self.hmac.secret
+
+    def get_game_scores(self) -> Scores:
+        add_tuples = lambda a, b: (a[0] + b[0], a[1] + b[1])
+        rounds_score = [r.scores for r in self.rounds]
+        total_scores = reduce(add_tuples, rounds_score, (0, 0))
+        return Scores(*total_scores)
 
     def get_round_status(self):
         if not self.rounds:
             return RoundStatus.FINISHED
         return self.rounds[-1].status
 
+    def set_round_scores(self, scores: Scores):
+        self.rounds[-1].scores = scores
+
     def write_result(self):
-        round_result = self.result_function(
-            self.get_last_user_move(), self.get_last_computer_move()
-        )
+        user_move = self.get_last_user_move()
+        computer_move = self.get_last_computer_move()
+        round_result = self.result_function(user_move, computer_move)
         self.set_round_result(round_result)
+        self.set_round_scores(self.wd.get_scores(user_move, computer_move))
 
     def generate_computer_move(self) -> str:
         if self.get_round_status() == RoundStatus.STARTED:
@@ -72,7 +88,11 @@ class Game:
 
     def prepare_round(self):
         self.generate_computer_move()
+        scores = self.get_game_scores()
         print(f"[bold cyan]*** ROUND {self.get_round_number()} ***[/]")
+        print(
+            f"[bold cyan]*** GAME SCORES: Player {scores.Player}:{scores.Computer} Computer ***[/]"
+        )
         print("Computer player has made his move")
         print(f"[bold]HMAC[/] for it: [bold]{self.get_last_hmac()}\n")
 
@@ -125,28 +145,3 @@ class Game:
 
     def get_computer_moves(self) -> list[str]:
         return [r.message for r in self.rounds if r.status == RoundStatus.FINISHED]
-
-    def check_winner(self, a: int | str, b: int | str) -> int:
-        n = len(self.moves)
-        if isinstance(a, str):
-            a = self.moves.index(a)
-        if isinstance(b, str):
-            b = self.moves.index(b)
-
-        if a >= n or b >= n or a < 0 or b < 0:
-            raise IndexError("Index out of range")
-
-        p = math.floor(n / 2)
-        return (a - b + p + n) % n - p
-
-    def generate_result_function(self, draw: str, a_winner: str, b_winner: str):
-        def _result(a: int | str, b: int | str) -> str:
-            r = self.check_winner(a, b)
-            if r == 0:
-                return draw
-            elif r > 0:
-                return b_winner
-            elif r < 0:
-                return a_winner
-
-        return _result

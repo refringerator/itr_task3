@@ -73,7 +73,7 @@ class Engine:
         self.game.show_hello_message()
 
     def on_enter_help(self):
-        self.help_action(self.game)
+        self.help_action(self.game.wd)
 
     def on_enter_finish(self):
         self.game.show_finish_message()

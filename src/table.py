@@ -8,7 +8,7 @@ def show_table(game):
     table = PrettyTable()
     table.field_names = ["v PC \\ User >", *game.moves]
 
-    res = game.generate_result_function("Draw", "Win", "Lose")
+    res = game.generate_result_function("Draw", "Lose", "Win")
     for row_move in game.moves:
         table.add_row([row_move, *[res(row_move, col_move) for col_move in game.moves]])
 

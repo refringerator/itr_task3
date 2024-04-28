@@ -28,8 +28,8 @@ def main(params: list[str]):
     game = Game(moves=params)
     game.set_result_function(
         "[bold yellow]Draw[/]",
-        "[magenta bold]Computer win![/]",
         "[green bold]You win![/]",
+        "[magenta bold]Computer win![/]",
     )
 
     engine = Engine(
