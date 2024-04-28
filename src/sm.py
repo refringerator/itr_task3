@@ -58,12 +58,10 @@ class Engine:
         game: Game,
         help_action=None,
         finish_action=None,
-        round_action=None,
     ):
         self.game = game
         self.help_action = self.prepare_function(help_action)
         self.finish_action = self.prepare_function(finish_action)
-        self.round_action = self.prepare_function(round_action)
 
     @staticmethod
     def prepare_function(func):
@@ -81,8 +79,7 @@ class Engine:
         self.finish_action()
 
     def on_enter_round(self):
-        self.round_action(self.game.last_user_move, self.game)
-        # self.game.show_round_start_message()
+        self.game.write_result()
         self.game.finish_round()
 
     def on_exit_round(self):

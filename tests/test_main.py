@@ -1,8 +1,25 @@
 import subprocess
 import os
+import pytest
+
 
 
 run_script = os.getenv("TASK3_RUN", "python src/main.py").split()
+
+
+@pytest.fixture(autouse=True)
+def run_before_and_after_tests(request):
+    if 'noautofixt' in request.keywords:
+        print("NONE ", end='')
+        yield
+        return
+    
+    os.environ["RICH_DISABLE_ANSI"] = "1"
+    os.environ["SLEEP"] = "0"
+    yield
+    del os.environ["RICH_DISABLE_ANSI"]
+    del os.environ["SLEEP"]
+    
 
 
 def test_without_params():
@@ -33,6 +50,7 @@ def test_even_params():
     assert "must be an odd" in result.stderr
 
 
+@pytest.mark.noautofixt
 def test_three_different_params():
     process = subprocess.Popen(
         [*run_script, "1", "2", "3"],
@@ -41,7 +59,7 @@ def test_three_different_params():
         stderr=subprocess.PIPE,
         universal_newlines=True,
     )
-    input_text = "Available moves"
-    output, _ = process.communicate(input=input_text)
+    output, _ = process.communicate()
 
+    input_text = "Available moves"
     assert input_text in output

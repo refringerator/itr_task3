@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 
 from helpers import check_params, generate_check_url
 from game import Game
@@ -16,8 +17,8 @@ def delayed_rich_print(*args, **kwargs):
     sep = kwargs.get("sep", " ")
     lines = sep.join([str(arg) for arg in args]).split("\n")
     for line in lines:
-        time.sleep(0.05)
-        rich_print(line)
+        time.sleep(os.getenv("SLEEP", 0.05))
+        rich_print(line, **kwargs)
 
 
 __builtins__.print = delayed_rich_print
@@ -25,7 +26,7 @@ __builtins__.print = delayed_rich_print
 
 def main(params: list[str]):
     game = Game(moves=params)
-    result = game.generate_result_function(
+    game.result_function = game.generate_result_function(
         "[bold yellow]Draw[/]",
         "[magenta bold]Computer win![/]",
         "[green bold]You win![/]",
@@ -35,12 +36,9 @@ def main(params: list[str]):
         game,
         help_action=show_table,
         finish_action=lambda: print(
-            f"\nHere is the HMAC key that was used during the game: [bold purple4]{game.secret}[/]\n"
+            f"\nHere is the HMAC key that was used during the game: [bold purple4]{game.get_secret()}[/]\n"
             f"You can check HMAC for computer's moves on the following website\n"
-            f"{generate_check_url(game.secret, game.get_computer_moves())}"
-        ),
-        round_action=lambda user_move, game: game.set_round_result(
-            f"{result(user_move, game.last_computer_move)}"
+            f"{generate_check_url(game.get_secret(), game.get_computer_moves())}"
         ),
     )
 

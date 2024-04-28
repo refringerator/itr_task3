@@ -1,5 +1,6 @@
+from dataclasses import dataclass
 import pytest
-from src.game import Game
+from src.game import Game, RoundStatus
 
 
 def test_draft():
@@ -26,16 +27,24 @@ def test_exception():
 
 
 def test_get_computer_moves_finished_round():
-    game = Game(["1", "2", "3", "4", "5"])
-    game.computer_moves = ["1", "2", "3"]
-    game.round_finished = True
+    @dataclass
+    class TestRound:
+        message: str
+        status: RoundStatus = RoundStatus.STARTED
 
-    assert ["1", "2", "3"] == game.get_computer_moves()
+    game = Game(["1", "2", "3", "4", "5"])
+    game.rounds = [TestRound(message='1', status=RoundStatus.FINISHED), TestRound(message='2', status=RoundStatus.FINISHED)]
+
+    assert ["1", "2"] == game.get_computer_moves()
 
 
 def test_get_computer_moves_unfinished_round():
-    game = Game(["1", "2", "3", "4", "5"])
-    game.computer_moves = ["1", "2", "3"]
-    game.round_finished = False
+    @dataclass
+    class TestRound():
+        message: str
+        status: RoundStatus = RoundStatus.STARTED
 
-    assert ["1", "2"] == game.get_computer_moves()
+    game = Game(["1", "2", "3", "4", "5"])
+    game.rounds = [TestRound(message='1', status=RoundStatus.FINISHED), TestRound(message='2')]
+
+    assert ["1"] == game.get_computer_moves()

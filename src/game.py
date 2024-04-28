@@ -2,57 +2,88 @@ from dataclasses import dataclass
 import math
 import random
 from secret import Hmac
+from enum import Enum
+
+RoundStatus = Enum("RoudStatus", ["STARTED", "FINISHED"])
 
 
 @dataclass
 class Round:
     number: int
     computer_move: str
+    message: str
     hmac: str
-    player_move: str
-    finished: bool
+    status = RoundStatus.STARTED
+    player_move: str = ""
+    result: str = ""
 
 
 class Game:
+    result_function = lambda *args: ""
+
     def __init__(self, moves: list[str], secret=""):
         self.hmac = Hmac(secret_key=secret)
-        self.secret = self.hmac.secret
-        self.moves = moves
-        self.rounds = []
-        self.round_number = 0
+        self.rounds: list[Round] = []
         self.computer_moves = []
-        self.last_computer_move = ""
-        self.last_user_move = ""
-        self.round_result = ""
-        self.round_finished = True
+        self.moves = moves
+
+    def get_secret(self):
+        return self.hmac.secret
+
+    def get_round_status(self):
+        if not self.rounds:
+            return RoundStatus.FINISHED
+        return self.rounds[-1].status
+
+    def write_result(self):
+        round_result = self.result_function(
+            self.get_last_user_move(), self.get_last_computer_move()
+        )
+        self.set_round_result(round_result)
 
     def generate_computer_move(self) -> str:
-        if self.round_finished:
-            self.round_finished = False
-            self.round_number += 1
-            self.last_computer_move = random.choice(self.moves)
-            message = f"{self.round_number}) {self.last_computer_move}"
-            self.computer_moves.append(message)
+        if self.get_round_status() == RoundStatus.STARTED:
+            return
 
-        return self.computer_moves[-1]
+        computer_move = random.choice(self.moves)
+        round_number = self.get_round_number() + 1
+        message = f"{round_number}) {computer_move}"
+
+        round = Round(
+            computer_move=computer_move,
+            number=round_number,
+            message=message,
+            hmac=self.hmac.calc(message),
+        )
+
+        self.rounds.append(round)
+
+    def get_last_hmac(self):
+        return self.rounds[-1].hmac
+
+    def get_round_number(self):
+        return len(self.rounds)
 
     def prepare_round(self):
-        message = self.generate_computer_move()
-        hmac_code = self.hmac.calc(message)
-        print(f"[bold cyan]*** ROUND {self.round_number} ***[/]")
-        print(f"HMAC: {hmac_code}")
+        self.generate_computer_move()
+        print(f"[bold cyan]*** ROUND {self.get_round_number()} ***[/]")
+        print("Computer player has made his move")
+        print(f"[bold]HMAC[/] for it: [bold]{self.get_last_hmac()}\n")
 
     def finish_round(self):
-        self.round_finished = True
+        self.rounds[-1].status = RoundStatus.FINISHED
 
     def set_round_result(self, round_result):
-        self.round_result = round_result
+        self.rounds[-1].result = round_result
 
     def set_last_user_move(self, user_move):
-        self.last_user_move = user_move
+        self.rounds[-1].player_move = user_move
 
-    def show_round_start_message(self):
-        print("Round start")
+    def get_last_user_move(self):
+        return self.rounds[-1].player_move
+
+    def get_last_computer_move(self):
+        return self.rounds[-1].computer_move
 
     def show_hello_message(self):
         print(
@@ -64,18 +95,18 @@ class Game:
         )
 
     def show_round_result(self):
+        last_round = self.rounds[-1]
         print(
             (
-                f"Your move: {self.last_user_move}\n"
-                f"Computer move: {self.last_computer_move}\n"
-                f"{self.round_result}\n"
+                f"Your move: [bold]{last_round.player_move}\n"
+                f"Computer move: [bold]{last_round.computer_move}\n"
+                f"{last_round.result}\n"
                 f"{'*' * 80}"
             )
         )
 
     def get_computer_moves(self) -> list[str]:
-        last_move = None if self.round_finished else -1
-        return self.computer_moves[:last_move]
+        return [r.message for r in self.rounds if r.status == RoundStatus.FINISHED]
 
     def check_winner(self, a: int | str, b: int | str) -> int:
         n = len(self.moves)
