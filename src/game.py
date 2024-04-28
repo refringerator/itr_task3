@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import math
 import random
+from table import show_rich_table
 from secret import Hmac
 from enum import Enum
 
@@ -19,13 +20,18 @@ class Round:
 
 
 class Game:
-    result_function = lambda *args: ""
-
+    def _result_function(*args):
+        return ""
+    result_function = _result_function
+    
     def __init__(self, moves: list[str], secret=""):
         self.hmac = Hmac(secret_key=secret)
         self.rounds: list[Round] = []
         self.computer_moves = []
         self.moves = moves
+
+    def set_result_function(self, *args):
+        self.result_function = self.generate_result_function(*args)
 
     def get_secret(self):
         return self.hmac.secret
@@ -92,6 +98,18 @@ class Game:
             "[bold]Hash-based message authentication code (HMAC) of this move shown to the player.\n"
             "[bold]To ensure that the computer is not cheating, at the end, a secret key\n"
             "[bold]and a link to a website where this can be verified will be displayed.\n"
+        )
+
+    def show_finish_message(self):
+        finished_rounds = [r for r in self.rounds if r.status == RoundStatus.FINISHED]
+        if not finished_rounds:
+            return
+
+        show_rich_table(
+            title="Messages to check",
+            columns=["Message", "HMAC"],
+            caption="All messages and their encrypted form for the entire game are collected here",
+            rows=[(r.message, r.hmac) for r in finished_rounds],
         )
 
     def show_round_result(self):

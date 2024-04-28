@@ -3,23 +3,21 @@ import os
 import pytest
 
 
-
 run_script = os.getenv("TASK3_RUN", "python src/main.py").split()
 
 
 @pytest.fixture(autouse=True)
 def run_before_and_after_tests(request):
-    if 'noautofixt' in request.keywords:
-        print("NONE ", end='')
+    if "noautofixt" in request.keywords:
+        print("NONE ", end="")
         yield
         return
-    
+
     os.environ["RICH_DISABLE_ANSI"] = "1"
     os.environ["SLEEP"] = "0"
     yield
     del os.environ["RICH_DISABLE_ANSI"]
     del os.environ["SLEEP"]
-    
 
 
 def test_without_params():

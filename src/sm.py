@@ -76,6 +76,7 @@ class Engine:
         self.help_action(self.game)
 
     def on_enter_finish(self):
+        self.game.show_finish_message()
         self.finish_action()
 
     def on_enter_round(self):

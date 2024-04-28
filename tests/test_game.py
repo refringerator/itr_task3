@@ -33,18 +33,24 @@ def test_get_computer_moves_finished_round():
         status: RoundStatus = RoundStatus.STARTED
 
     game = Game(["1", "2", "3", "4", "5"])
-    game.rounds = [TestRound(message='1', status=RoundStatus.FINISHED), TestRound(message='2', status=RoundStatus.FINISHED)]
+    game.rounds = [
+        TestRound(message="1", status=RoundStatus.FINISHED),
+        TestRound(message="2", status=RoundStatus.FINISHED),
+    ]
 
     assert ["1", "2"] == game.get_computer_moves()
 
 
 def test_get_computer_moves_unfinished_round():
     @dataclass
-    class TestRound():
+    class TestRound:
         message: str
         status: RoundStatus = RoundStatus.STARTED
 
     game = Game(["1", "2", "3", "4", "5"])
-    game.rounds = [TestRound(message='1', status=RoundStatus.FINISHED), TestRound(message='2')]
+    game.rounds = [
+        TestRound(message="1", status=RoundStatus.FINISHED),
+        TestRound(message="2"),
+    ]
 
     assert ["1"] == game.get_computer_moves()
