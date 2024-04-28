@@ -15,8 +15,8 @@ def generate_check_url(key: str, computer_moves: list[str]) -> str:
 
 
 def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-    print("Usage example: python", sys.argv[0], "rock", "paper", "scissors")
+    print("[red bold]", *args, file=sys.stderr, **kwargs)
+    print("[deep_sky_blue1]Usage example: python", sys.argv[0], "rock", "paper", "scissors")
     sys.exit(1)
 
 
