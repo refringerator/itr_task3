@@ -33,12 +33,13 @@ class Game:
             self.last_computer_move = random.choice(self.moves)
             message = f"{self.round_number}) {self.last_computer_move}"
             self.computer_moves.append(message)
-        
+
         return self.computer_moves[-1]
 
     def prepare_round(self):
         message = self.generate_computer_move()
         hmac_code = self.hmac.calc(message)
+        print(f"[bold cyan]*** ROUND {self.round_number} ***[/]")
         print(f"HMAC: {hmac_code}")
 
     def finish_round(self):
@@ -49,6 +50,18 @@ class Game:
 
     def set_last_user_move(self, user_move):
         self.last_user_move = user_move
+
+    def show_round_start_message(self):
+        print("Round start")
+
+    def show_hello_message(self):
+        print(
+            "\n[bold]At the beginning of each round, the computer makes his move.\n"
+            "[bold]The round number and the computer's move are concatenated and encrypted.\n"
+            "[bold]Hash-based message authentication code (HMAC) of this move shown to the player.\n"
+            "[bold]To ensure that the computer is not cheating, at the end, a secret key\n"
+            "[bold]and a link to a website where this can be verified will be displayed.\n"
+        )
 
     def show_round_result(self):
         print(

@@ -59,19 +59,20 @@ class Engine:
         help_action=None,
         finish_action=None,
         round_action=None,
-        show_info_action=None,
     ):
         self.game = game
         self.help_action = self.prepare_function(help_action)
         self.finish_action = self.prepare_function(finish_action)
         self.round_action = self.prepare_function(round_action)
-        self.show_info_action = self.prepare_function(show_info_action)
 
     @staticmethod
     def prepare_function(func):
         if not func:
             return lambda *args: None
         return func
+
+    def on_enter_start(self):
+        self.game.show_hello_message()
 
     def on_enter_help(self):
         self.help_action(self.game)
@@ -81,13 +82,14 @@ class Engine:
 
     def on_enter_round(self):
         self.round_action(self.game.last_user_move, self.game)
+        # self.game.show_round_start_message()
         self.game.finish_round()
 
     def on_exit_round(self):
         self.game.show_round_result()
 
     def on_enter_show_info(self):
-        self.show_info_action(self.game)
+        self.game.prepare_round()
 
     def move(self, ans):
         self.game.set_last_user_move(ans)

@@ -6,12 +6,15 @@ MenuItem = namedtuple("MenuItem", ["key", "description", "action"])
 
 
 class Menu:
-    def __init__(self, items: list[MenuItem], header="", template="") -> None:
+    def __init__(
+        self, items: list[MenuItem], header="", template="", error_message=""
+    ) -> None:
         if not template:
             template = "$key - $description"
         self.template = Template(template)
         self.items = items
         self.header = header
+        self.error_message = error_message
 
     def generate_menu(self) -> str:
         sub = self.template.safe_substitute
@@ -27,7 +30,7 @@ class Menu:
         print(self.generate_menu())
         user_input = input(text)
         while not self.check_input(user_input):
-            print("Invalid input!")
+            print(self.error_message)
             return self.select(text)
 
         return reduce(

@@ -32,6 +32,7 @@ def test_get_computer_moves_finished_round():
 
     assert ["1", "2", "3"] == game.get_computer_moves()
 
+
 def test_get_computer_moves_unfinished_round():
     game = Game(["1", "2", "3", "4", "5"])
     game.computer_moves = ["1", "2", "3"]

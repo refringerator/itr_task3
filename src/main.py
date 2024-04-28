@@ -8,35 +8,56 @@ from menu import Menu, MenuItem
 from table import show_table
 from sm import InteractMachine, Engine
 
+import time
+from rich import print as rich_print
+
+
+def delayed_rich_print(*args, **kwargs):
+    sep = kwargs.get("sep", " ")
+    lines = sep.join([str(arg) for arg in args]).split("\n")
+    for line in lines:
+        time.sleep(0.05)
+        rich_print(line)
+
+
+__builtins__.print = delayed_rich_print
+
 
 def main(params: list[str]):
     game = Game(moves=params)
-    result = game.generate_result_function("Draw", "Computer win!", "You win!")
-
-    menu = Menu(
-        header="Available moves:",
-        items=(
-            [MenuItem(str(i), val, val) for i, val in enumerate(game.moves, 1)]
-            + [MenuItem("0", "exit", Engine.EXIT)]
-            + [MenuItem("?", "help", Engine.HELP)]
-        ),
+    result = game.generate_result_function(
+        "[bold yellow]Draw[/]",
+        "[magenta bold]Computer win![/]",
+        "[green bold]You win![/]",
     )
 
     engine = Engine(
         game,
         help_action=show_table,
         finish_action=lambda: print(
-            f"Here HMAC key: {game.secret}\n"
+            f"\nHere is the HMAC key that was used during the game: [bold purple4]{game.secret}[/]\n"
             f"You can check HMAC for computer's moves on the following website\n"
             f"{generate_check_url(game.secret, game.get_computer_moves())}"
         ),
-        round_action=lambda user_move, game: game.set_round_result(f"{result(user_move, game.last_computer_move)}"),      
-        show_info_action=lambda game: game.prepare_round(),
+        round_action=lambda user_move, game: game.set_round_result(
+            f"{result(user_move, game.last_computer_move)}"
+        ),
+    )
+
+    menu = Menu(
+        header="[bold underline]Available moves:[/]",
+        items=(
+            [MenuItem(str(i), val, val) for i, val in enumerate(game.moves, 1)]
+            + [MenuItem("0", "exit", Engine.EXIT)]
+            + [MenuItem("?", "help", Engine.HELP)]
+        ),
+        template="[bold blue]$key[/] - [italic bold]$description[/]",
+        error_message="[bold red]Invalid input![/]",
     )
 
     def input_function():
         return menu.select("Enter your move: ")
-    
+
     sm = InteractMachine(input_function, engine)
     sm.run()
 
