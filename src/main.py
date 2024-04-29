@@ -6,7 +6,7 @@ import os
 from helpers import check_params, generate_check_url
 from game import Game
 from menu import Menu, MenuItem
-from table import show_table
+from table import show_interactive_help
 from sm import InteractMachine, Engine
 
 import time
@@ -34,7 +34,7 @@ def main(params: list[str]):
 
     engine = Engine(
         game,
-        help_action=show_table,
+        help_action=show_interactive_help,
         finish_action=lambda: print(
             f"\nHere is the HMAC key that was used during the game: [bold medium_purple3]{game.get_secret()}[/]\n"
             f"You can check HMAC for computer's moves on the following website\n"

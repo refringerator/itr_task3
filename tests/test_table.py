@@ -1,9 +1,9 @@
-from src.winner_determination import WinnerDetermination as WD
 from src.table import show_table
+from src.game import Game
 
 
 def test_three_moves(capsys):
-    game = WD(["rock", "paper", "scissors"])
+    game = Game(["rock", "paper", "scissors"])
     out = """Table shows your result
 +---------------+------+-------+----------+
 | v PC \\ User > | rock | paper | scissors |
@@ -20,7 +20,7 @@ def test_three_moves(capsys):
 
 
 def test_seven_moves(capsys):
-    game = WD(["python", "rust", "ruby", "java", "php", "js", "c#"])
+    game = Game(["python", "rust", "ruby", "java", "php", "js", "c#"])
     out = """Table shows your result
 +---------------+--------+------+------+------+------+------+------+
 | v PC \\ User > | python | rust | ruby | java | php  |  js  |  c#  |

@@ -43,7 +43,9 @@ class Game:
         return self.hmac.secret
 
     def get_game_scores(self) -> Scores:
-        add_tuples = lambda a, b: (a[0] + b[0], a[1] + b[1])
+        def add_tuples(a, b):
+            return a[0] + b[0], a[1] + b[1]
+
         rounds_score = [r.scores for r in self.rounds]
         total_scores = reduce(add_tuples, rounds_score, (0, 0))
         return Scores(*total_scores)
@@ -121,7 +123,7 @@ class Game:
         )
 
     def show_finish_message(self):
-        finished_rounds = [r for r in self.rounds if r.status == RoundStatus.FINISHED]
+        finished_rounds = self.get_finished_rounds()
         if not finished_rounds:
             return
 
@@ -144,4 +146,7 @@ class Game:
         )
 
     def get_computer_moves(self) -> list[str]:
-        return [r.message for r in self.rounds if r.status == RoundStatus.FINISHED]
+        return [r.message for r in self.get_finished_rounds()]
+
+    def get_finished_rounds(self) -> list[Round]:
+        return [r for r in self.rounds if r.status == RoundStatus.FINISHED]
