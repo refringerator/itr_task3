@@ -14,4 +14,4 @@ class Hmac:
         return hmac.new(self.secret.encode(), message.encode(), self.hasher).hexdigest()
 
     def generate_secret_key(self) -> str:
-        return secrets.token_urlsafe(16)
+        return secrets.token_urlsafe(32)
